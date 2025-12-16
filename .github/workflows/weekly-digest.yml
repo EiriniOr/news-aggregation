@@ -1,0 +1,60 @@
+name: Generate Weekly News Digest
+
+on:
+  schedule:
+    # Run every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install anthropic requests feedparser openai
+
+      - name: Generate weekly digest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python3 generate_weekly_digest.py
+
+      - name: Upload audio artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: weekly-audio
+          path: |
+            output/audio/*.mp3
+            output/audio/*.json
+          retention-days: 30
+
+      - name: Deploy to GitHub Pages
+        run: |
+          cd output
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git init
+          git checkout -b gh-pages
+          git add .
+          git commit -m "Update news digest - $(date +'%Y-%m-%d')"
+          git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages

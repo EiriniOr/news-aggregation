@@ -1,0 +1,58 @@
+# Global News Weekly - Git Ignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Data files (contains collected news)
+data/
+*.json
+
+# Log files
+logs/
+*.log
+
+# Output files
+output/
+*.html
+
+# Audio files
+audio/
+*.mp3
+*.wav
+
+# API Keys and secrets
+.env
+*.key
+.credentials/
+
+# OS files
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# pytest
+.pytest_cache/
+.tox/
+
+# Keep directory structure
+!.gitkeep
+!output/.gitkeep
+!data/.gitkeep
+!logs/.gitkeep

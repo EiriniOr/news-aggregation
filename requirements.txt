@@ -1,0 +1,13 @@
+# Global News Weekly - Dependencies
+
+# Core
+anthropic>=0.39.0
+
+# News collection
+feedparser>=6.0.10
+requests>=2.31.0
+
+# Audio generation
+openai>=1.0.0
+
+# Keep minimal - no unnecessary dependencies
