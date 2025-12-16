@@ -37,11 +37,17 @@ class AudioGenerator:
 
         sections = curated_data.get('sections', {})
 
-        prompt = f"""Create a natural, professional 2-3 minute audio script about this week's international politics and Swedish news.
+        prompt = f"""Create a natural, professional 2-3 minute audio script about this week's international politics and war-related news.
+
+IMPORTANT CONTEXT:
+- Today's date is {datetime.now().strftime('%B %d, %Y')} (2025)
+- Donald Trump has been president since January 2025, so refer to him as "President Trump" not "President-elect Trump"
+- The narrator's name is Jimmy - sign off as "Jimmy" at the end
 
 Style:
-- Professional news broadcaster tone
-- Clear, articulate delivery
+- Professional, upbeat news broadcaster tone (like a confident TV news anchor)
+- Engaging and energetic, not sad or somber
+- Clear, articulate delivery with natural pacing
 - Short, impactful sentences
 - Natural transitions between topics
 - Time: approximately 2-3 minutes total
@@ -55,24 +61,23 @@ International Politics ({len(sections.get('International Politics', []))} items)
 War & Conflict ({len(sections.get('War & Conflict', []))} items):
 {json.dumps(sections.get('War & Conflict', [])[:3], indent=2, ensure_ascii=False)}
 
-Swedish News ({len(sections.get('Swedish News', []))} items):
-{json.dumps(sections.get('Swedish News', [])[:3], indent=2, ensure_ascii=False)}
-
 Diplomacy & Relations ({len(sections.get('Diplomacy & Relations', []))} items):
 {json.dumps(sections.get('Diplomacy & Relations', [])[:3], indent=2, ensure_ascii=False)}
+
+Global Security ({len(sections.get('Global Security', []))} items):
+{json.dumps(sections.get('Global Security', [])[:2], indent=2, ensure_ascii=False)}
 
 Output as JSON with sections for timing:
 {{
   "intro": "Hook and welcome (5-10 seconds)",
   "summary": "Weekly overview (15-20 seconds)",
-  "international": "International politics highlights - mention top 2-3 stories (30-40 seconds)",
-  "conflict": "War and conflict updates - mention top 2-3 stories (30-40 seconds)",
-  "swedish": "Swedish news - mention top 2-3 stories (25-35 seconds)",
-  "diplomacy": "Diplomacy highlights - mention top 2 stories (20-30 seconds)",
-  "outro": "Sign-off (10 seconds)"
+  "international": "International politics highlights - mention top 2-3 stories (35-45 seconds)",
+  "conflict": "War and conflict updates - mention top 2-3 stories (35-45 seconds)",
+  "diplomacy": "Diplomacy highlights - mention top 2 stories (25-35 seconds)",
+  "outro": "Sign-off with 'I'm Jimmy, thanks for listening' (10 seconds)"
 }}
 
-Focus on the most significant developments. Keep it authoritative and informative."""
+Focus on the most significant developments. Keep it authoritative, confident, and engaging - like a professional news broadcast."""
 
         message = self.claude_client.messages.create(
             model="claude-sonnet-4-5-20250929",
@@ -104,13 +109,12 @@ Focus on the most significant developments. Keep it authoritative and informativ
         except json.JSONDecodeError:
             # Fallback to simple script
             script = {
-                "intro": f"Welcome to Global News Weekly for {datetime.now().strftime('%B %d, %Y')}. Your digest of international politics, conflict analysis, and Swedish news.",
+                "intro": f"Welcome to Global News Weekly for {datetime.now().strftime('%B %d, %Y')}. Your digest of international politics and global security.",
                 "summary": curated_data.get('weekly_summary', ''),
                 "international": f"This week in international politics, we saw {len(sections.get('International Politics', []))} major developments.",
                 "conflict": f"On the conflict front, {len(sections.get('War & Conflict', []))} important updates.",
-                "swedish": f"In Swedish news, {len(sections.get('Swedish News', []))} significant stories.",
                 "diplomacy": f"And in diplomacy, {len(sections.get('Diplomacy & Relations', []))} notable developments.",
-                "outro": "That's your Global News Weekly. For full details, visit the link below."
+                "outro": "That's your Global News Weekly. I'm Jimmy, thanks for listening."
             }
 
         # Save script
@@ -136,7 +140,6 @@ Focus on the most significant developments. Keep it authoritative and informativ
                 script.get('summary', ''),
                 script.get('international', ''),
                 script.get('conflict', ''),
-                script.get('swedish', ''),
                 script.get('diplomacy', ''),
                 script.get('outro', '')
             ])

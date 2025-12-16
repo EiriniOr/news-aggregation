@@ -1,7 +1,7 @@
 # Weekly International Politics Digest Configuration
 
 sources:
-  # RSS feeds for international politics and Swedish news
+  # RSS feeds for international politics and war-related news
   rss_feeds:
     - url: "https://www.theguardian.com/world/rss"
       name: "The Guardian - World News"
@@ -11,20 +11,24 @@ sources:
       name: "Al Jazeera"
     - url: "https://www.reuters.com/rssFeed/worldNews"
       name: "Reuters World"
-    - url: "https://www.svd.se/rss.xml"
-      name: "Svenska Dagbladet"
-    - url: "https://www.dn.se/rss/"
-      name: "Dagens Nyheter"
-    - url: "https://feeds.aftonbladet.se/rss2/small/pages/sections/senastenytt/"
-      name: "Aftonbladet"
-    - url: "https://www.thelocal.se/feed/"
-      name: "The Local Sweden"
+    - url: "https://feeds.washingtonpost.com/rss/world"
+      name: "Washington Post - World"
+    - url: "https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/section/world/rss.xml"
+      name: "New York Times - World"
+    - url: "https://www.ft.com/world?format=rss"
+      name: "Financial Times - World"
+    - url: "https://www.economist.com/international/rss.xml"
+      name: "The Economist - International"
+    - url: "https://foreignpolicy.com/feed/"
+      name: "Foreign Policy"
+    - url: "https://www.cfr.org/feed/news"
+      name: "Council on Foreign Relations"
 
 categories:
   - "International Politics"
   - "War & Conflict"
-  - "Swedish News"
   - "Diplomacy & Relations"
+  - "Global Security"
 
 max_items_per_source: 20
 max_curated_items: 15

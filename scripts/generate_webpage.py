@@ -616,7 +616,8 @@ class WebpageGenerator:
     </div>
 
     <div class="footer">
-        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, Svenska Dagbladet, Dagens Nyheter, Aftonbladet, The Local Sweden</p>
+        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, Washington Post, New York Times, Financial Times, The Economist, Foreign Policy, CFR</p>
+        <p style="margin-top: 20px; font-size: 0.9em;">Created by Eirini Ornithopoulou for Meli, 2025</p>
     </div>
 </body>
 </html>
