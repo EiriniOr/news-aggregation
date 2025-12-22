@@ -46,45 +46,48 @@ class ContentCurator:
             })
 
         # Create prompt for Claude
-        prompt = f"""You are curating a weekly digest for international politics, war updates, and Swedish news.
+        prompt = f"""Curate weekly digest for international politics, war updates, Swedish news.
 
-I have {len(articles_summary)} articles from this week. Please:
+{len(articles_summary)} articles from this week. Tasks:
 
-1. Filter to the most relevant and important articles
-2. Categorize them into these sections:
-   - International Politics (major diplomatic developments, elections, policy changes)
+1. Filter most relevant/important articles
+2. Categorize into sections:
+   - International Politics (diplomatic developments, elections, policy changes)
    - War & Conflict (military operations, conflicts, peace negotiations)
-   - Swedish News (domestic Swedish politics, economy, society)
+   - Swedish News (Swedish politics, economy, society)
    - Diplomacy & Relations (international relations, treaties, summits)
 
-3. For each selected article, provide:
+3. For each selected article provide:
    - Section assignment
-   - One-sentence insight explaining its significance
+   - One-sentence insight explaining significance
    - Relevance score (1-10)
 
-4. Select the TOP 8-10 items per section (prioritize the most significant stories)
+4. Select TOP 8-10 items per section (most significant stories)
 
-Here are the articles:
+Articles:
 
 {json.dumps(articles_summary, indent=2, ensure_ascii=False)}
 
-Return ONLY a valid JSON object with this structure:
+CRITICAL: Return ONLY valid JSON. No markdown, no code blocks, no explanatory text. Start with {{ and end with }}.
+
+Structure:
 {{
   "sections": {{
     "International Politics": [
       {{"id": 1, "title": "...", "url": "...", "source": "...", "insight": "...", "score": 9}}
     ],
-    "War & Conflict": [...],
-    "Swedish News": [...],
-    "Diplomacy & Relations": [...]
+    "War & Conflict": [],
+    "Swedish News": [],
+    "Diplomacy & Relations": []
   }},
-  "weekly_summary": "2-3 sentence summary of the week's major themes and developments"
+  "weekly_summary": "2-3 sentence summary of week's major themes"
 }}"""
 
-        # Call Claude
+        # Call Claude with higher token limit for complete JSON
         message = self.client.messages.create(
             model="claude-sonnet-4-5-20250929",
-            max_tokens=4000,
+            max_tokens=8000,
+            temperature=0.3,
             messages=[{"role": "user", "content": prompt}]
         )
 
@@ -92,10 +95,25 @@ Return ONLY a valid JSON object with this structure:
 
         # Parse JSON response
         try:
-            # Find JSON in response
-            json_start = response_text.find('{')
-            json_end = response_text.rfind('}') + 1
-            json_str = response_text[json_start:json_end]
+            # Remove markdown code blocks if present
+            json_str = response_text.strip()
+            if json_str.startswith('```json'):
+                json_str = json_str[7:]
+            elif json_str.startswith('```'):
+                json_str = json_str[3:]
+            if json_str.endswith('```'):
+                json_str = json_str[:-3]
+
+            json_str = json_str.strip()
+
+            # Find JSON bounds
+            json_start = json_str.find('{')
+            json_end = json_str.rfind('}') + 1
+
+            if json_start == -1 or json_end == 0:
+                raise ValueError("No valid JSON object found in response")
+
+            json_str = json_str[json_start:json_end]
 
             curated = json.loads(json_str)
 
