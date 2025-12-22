@@ -83,14 +83,12 @@ class WebpageGenerator:
         section_icons = {
             "International Politics": "🌍",
             "War & Conflict": "⚔️",
-            "Swedish News": "🇸🇪",
             "Diplomacy & Relations": "🤝"
         }
 
         section_colors = {
             "International Politics": "#1e3a8a",
             "War & Conflict": "#991b1b",
-            "Swedish News": "#065f46",
             "Diplomacy & Relations": "#7c2d12"
         }
 
@@ -509,14 +507,12 @@ class WebpageGenerator:
         section_icons = {
             "International Politics": "🌍",
             "War & Conflict": "⚔️",
-            "Swedish News": "🇸🇪",
             "Diplomacy & Relations": "🤝"
         }
 
         section_colors = {
             "International Politics": "#1e3a8a",
             "War & Conflict": "#991b1b",
-            "Swedish News": "#065f46",
             "Diplomacy & Relations": "#7c2d12"
         }
 
