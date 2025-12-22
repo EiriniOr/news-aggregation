@@ -59,25 +59,13 @@ jobs:
           git commit -m "Update news digest - $(date +'%Y-%m-%d')"
           git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
 
-      # Email disabled - check GitHub Pages at https://EiriniOr.github.io/news-aggregation/
-      # - name: Send email notification
-      #   if: always()
-      #   uses: dawidd6/action-send-mail@v3
-      #   with:
-      #     server_address: smtp.gmail.com
-      #     server_port: 587
-      #     username: ${{ secrets.EMAIL_USERNAME }}
-      #     password: ${{ secrets.EMAIL_PASSWORD }}
-      #     subject: "Weekly International Politics Digest - ${{ job.status == 'success' && '✅ Generated Successfully' || '❌ Generation Failed' }}"
-      #     to: vidar.alkelin@me.com
-      #     from: International Politics Digest Bot
-      #     body: |
-      #       Weekly International Politics Digest generation completed with status: ${{ job.status }}
-      #
-      #       Date: $(date +'%Y-%m-%d %H:%M:%S')
-      #       Workflow: ${{ github.workflow }}
-      #
-      #       ${{ job.status == 'success' && '🌐 View the latest digest at: https://EiriniOr.github.io/news-aggregation/' || '❌ Check the workflow logs for details' }}
-      #
-      #       Repository: ${{ github.repository }}
-      #       Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Send email notification via IFTTT
+        if: success()
+        run: |
+          curl -X POST https://maker.ifttt.com/trigger/news_digest_published/with/key/${{ secrets.IFTTT_WEBHOOK_KEY }} \
+            -H "Content-Type: application/json" \
+            -d '{
+              "value1": "International Politics Digest",
+              "value2": "https://EiriniOr.github.io/news-aggregation/",
+              "value3": "'"$(date +%Y-%m-%d)"'"
+            }'
