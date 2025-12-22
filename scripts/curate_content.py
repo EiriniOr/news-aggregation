@@ -34,35 +34,32 @@ class ContentCurator:
 
         articles = news_data['articles']
 
-        # Prepare articles for Claude
+        # Prepare articles for Claude - limit to 50 most recent for efficiency
         articles_summary = []
-        for idx, article in enumerate(articles[:100], 1):  # Limit to 100 for token efficiency
+        for idx, article in enumerate(articles[:50], 1):
             articles_summary.append({
                 'id': idx,
                 'source': article['source'],
                 'title': article['title'],
-                'summary': article['summary'][:300],
+                'summary': article['summary'][:200],  # Shorter summaries
                 'url': article['url']
             })
 
         # Create prompt for Claude
         prompt = f"""Curate weekly digest for international politics, war updates, Swedish news.
 
-{len(articles_summary)} articles from this week. Tasks:
+{len(articles_summary)} articles. Tasks:
 
-1. Filter most relevant/important articles
+1. Filter most relevant articles
 2. Categorize into sections:
-   - International Politics (diplomatic developments, elections, policy changes)
-   - War & Conflict (military operations, conflicts, peace negotiations)
-   - Swedish News (Swedish politics, economy, society)
-   - Diplomacy & Relations (international relations, treaties, summits)
+   - International Politics
+   - War & Conflict
+   - Swedish News
+   - Diplomacy & Relations
 
-3. For each selected article provide:
-   - Section assignment
-   - One-sentence insight explaining significance
-   - Relevance score (1-10)
+3. For each article: section, brief insight (1 sentence), relevance score (1-10)
 
-4. Select TOP 5-6 items per section (most significant stories)
+4. Select TOP 5 items per section (20 total)
 
 Articles:
 
@@ -122,7 +119,7 @@ Structure:
             curated = json.loads(json_str)
 
             # Enrich with full article data
-            article_map = {idx: article for idx, article in enumerate(articles[:100], 1)}
+            article_map = {idx: article for idx, article in enumerate(articles[:50], 1)}
 
             for section_name, items in curated['sections'].items():
                 for item in items:
