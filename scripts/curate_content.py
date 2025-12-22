@@ -34,9 +34,9 @@ class ContentCurator:
 
         articles = news_data['articles']
 
-        # Prepare articles for Claude - limit to 50 most recent for efficiency
+        # Prepare articles for Claude - limit to 70 most recent
         articles_summary = []
-        for idx, article in enumerate(articles[:50], 1):
+        for idx, article in enumerate(articles[:70], 1):
             articles_summary.append({
                 'id': idx,
                 'source': article['source'],
@@ -58,7 +58,7 @@ class ContentCurator:
 
 3. For each article: section, brief insight (1 sentence), relevance score (1-10)
 
-4. Select TOP 6 items per section (18 total)
+4. Select TOP 8 items per section (24 total)
 
 Articles:
 
@@ -117,7 +117,7 @@ Structure:
             curated = json.loads(json_str)
 
             # Enrich with full article data
-            article_map = {idx: article for idx, article in enumerate(articles[:50], 1)}
+            article_map = {idx: article for idx, article in enumerate(articles[:70], 1)}
 
             for section_name, items in curated['sections'].items():
                 for item in items:
