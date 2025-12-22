@@ -62,7 +62,7 @@ class ContentCurator:
    - One-sentence insight explaining significance
    - Relevance score (1-10)
 
-4. Select TOP 8-10 items per section (most significant stories)
+4. Select TOP 5-6 items per section (most significant stories)
 
 Articles:
 
