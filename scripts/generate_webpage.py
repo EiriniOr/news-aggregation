@@ -441,7 +441,7 @@ class WebpageGenerator:
     <div class="header">
         <div class="header-content">
             <h1>Global News Weekly</h1>
-            <p class="subtitle">International Politics, Conflict Analysis & Swedish News</p>
+            <p class="subtitle">International Politics, Conflict Analysis & Diplomatic Relations</p>
             <p class="date">Week of {week_str}</p>
         </div>
     </div>
@@ -478,10 +478,10 @@ class WebpageGenerator:
 
     <!-- Footer -->
     <div class="footer">
-        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, Svenska Dagbladet, Dagens Nyheter, Aftonbladet, The Local Sweden</p>
+        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, New York Times, AP News, NPR, Financial Times</p>
         <p>Automatically generated every Monday at 6:00 AM UTC</p>
         <p style="margin-top: 20px; opacity: 0.7; font-size: 14px;">
-            Powered by Claude AI and OpenAI TTS
+            Created by Eirini Ornithopoulou, for Meli, 2025
         </p>
     </div>
 </body>
@@ -616,8 +616,8 @@ class WebpageGenerator:
     </div>
 
     <div class="footer">
-        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, Washington Post, New York Times, Financial Times, The Economist, Foreign Policy, CFR</p>
-        <p style="margin-top: 20px; font-size: 0.9em;">Created by Eirini Ornithopoulou for Meli, 2025</p>
+        <p>Sources: The Guardian, BBC, Al Jazeera, Reuters, New York Times, AP News, NPR, Financial Times</p>
+        <p style="margin-top: 20px; font-size: 0.9em;">Created by Eirini Ornithopoulou, for Meli, 2025</p>
     </div>
 </body>
 </html>
