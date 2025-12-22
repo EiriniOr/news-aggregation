@@ -59,13 +59,15 @@ jobs:
           git commit -m "Update news digest - $(date +'%Y-%m-%d')"
           git push -f https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
 
-      - name: Send email notification via IFTTT
+      - name: Send email via Resend
         if: success()
         run: |
-          curl -X POST https://maker.ifttt.com/trigger/news_digest_published/with/key/${{ secrets.IFTTT_WEBHOOK_KEY }} \
+          curl -X POST 'https://api.resend.com/emails' \
+            -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d '{
-              "value1": "International Politics Digest",
-              "value2": "https://EiriniOr.github.io/news-aggregation/",
-              "value3": "'"$(date +%Y-%m-%d)"'"
+              "from": "digest@resend.dev",
+              "to": ["vidar.alkelin@me.com"],
+              "subject": "📰 International Politics Digest Published",
+              "html": "<h2>Your weekly international politics digest is ready!</h2><p>View it here: <a href=\"https://EiriniOr.github.io/news-aggregation/\">https://EiriniOr.github.io/news-aggregation/</a></p><p>Generated: '"$(date +'%Y-%m-%d')"'</p>"
             }'
