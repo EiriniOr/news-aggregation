@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-News Aggregator - International Politics & Swedish News
+News Aggregator - International Politics
 Collects news from RSS feeds for weekly digest
 """
 
@@ -21,16 +21,12 @@ class NewsCollector:
         self.today = datetime.now()
         self.week_ago = self.today - timedelta(days=7)
 
-        # RSS feed sources
+        # RSS feed sources - international politics only
         self.feeds = {
             'guardian': 'https://www.theguardian.com/world/rss',
             'bbc_world': 'https://feeds.bbci.co.uk/news/world/rss.xml',
             'aljazeera': 'https://www.aljazeera.com/xml/rss/all.xml',
-            'reuters': 'https://www.reuters.com/rssfeed/worldNews',
-            'svenska_dagbladet': 'https://www.svd.se/?service=rss',
-            'dagens_nyheter': 'https://www.dn.se/rss/',
-            'aftonbladet': 'https://rss.aftonbladet.se/rss2/small/pages/sections/senastenytt/',
-            'thelocal_sweden': 'https://feeds.thelocal.com/rss/se'
+            'reuters': 'https://www.reuters.com/rssfeed/worldNews'
         }
 
     async def collect_from_feed(self, source_name: str, feed_url: str) -> List[Dict[str, Any]]:

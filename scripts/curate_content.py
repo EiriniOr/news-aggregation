@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Content Curator - International Politics & Swedish News
+Content Curator - International Politics
 Uses Claude to filter, categorize, and summarize news for the weekly digest
 """
 
@@ -46,7 +46,7 @@ class ContentCurator:
             })
 
         # Create prompt for Claude
-        prompt = f"""Curate weekly digest for international politics, war updates, Swedish news.
+        prompt = f"""Curate weekly digest for international politics and war updates.
 
 {len(articles_summary)} articles. Tasks:
 
@@ -54,12 +54,11 @@ class ContentCurator:
 2. Categorize into sections:
    - International Politics
    - War & Conflict
-   - Swedish News
    - Diplomacy & Relations
 
 3. For each article: section, brief insight (1 sentence), relevance score (1-10)
 
-4. Select TOP 5 items per section (20 total)
+4. Select TOP 6 items per section (18 total)
 
 Articles:
 
@@ -74,7 +73,6 @@ Structure:
       {{"id": 1, "title": "...", "url": "...", "source": "...", "insight": "...", "score": 9}}
     ],
     "War & Conflict": [],
-    "Swedish News": [],
     "Diplomacy & Relations": []
   }},
   "weekly_summary": "2-3 sentence summary of week's major themes"
