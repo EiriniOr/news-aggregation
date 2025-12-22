@@ -86,7 +86,7 @@ Structure:
         # Call Claude with higher token limit for complete JSON
         message = self.client.messages.create(
             model="claude-sonnet-4-5-20250929",
-            max_tokens=8000,
+            max_tokens=16384,  # Increased for large JSON responses
             temperature=0.3,
             messages=[{"role": "user", "content": prompt}]
         )
