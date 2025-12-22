@@ -95,25 +95,29 @@ Structure:
 
         # Parse JSON response
         try:
-            # Remove markdown code blocks if present
+            # Remove ALL markdown code blocks (multiple passes)
             json_str = response_text.strip()
-            if json_str.startswith('```json'):
-                json_str = json_str[7:]
-            elif json_str.startswith('```'):
-                json_str = json_str[3:]
-            if json_str.endswith('```'):
+
+            # Remove opening code fence
+            for prefix in ['```json\n', '```json', '```\n', '```']:
+                if json_str.startswith(prefix):
+                    json_str = json_str[len(prefix):]
+                    break
+
+            # Remove closing code fence
+            if '\n```' in json_str:
+                json_str = json_str[:json_str.rfind('\n```')]
+            elif json_str.endswith('```'):
                 json_str = json_str[:-3]
 
             json_str = json_str.strip()
 
-            # Find JSON bounds
-            json_start = json_str.find('{')
-            json_end = json_str.rfind('}') + 1
+            # Validate we have JSON
+            if not json_str.startswith('{'):
+                raise ValueError(f"Response doesn't start with '{{': {json_str[:100]}")
 
-            if json_start == -1 or json_end == 0:
-                raise ValueError("No valid JSON object found in response")
-
-            json_str = json_str[json_start:json_end]
+            if not json_str.endswith('}'):
+                raise ValueError(f"Response doesn't end with '}}': {json_str[-100:]}")
 
             curated = json.loads(json_str)
 
