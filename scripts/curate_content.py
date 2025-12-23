@@ -62,7 +62,7 @@ class ContentCurator:
 
 5. CRITICAL: Ensure source diversity. Select articles from ALL 6 sources:
    - BBC World
-   - Reuters
+   - Deutsche Welle (DW)
    - New York Times
    - Financial Times
    - Foreign Policy

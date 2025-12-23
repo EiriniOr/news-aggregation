@@ -476,7 +476,7 @@ class WebpageGenerator:
 
     <!-- Footer -->
     <div class="footer">
-        <p>Sources: BBC, Reuters, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
+        <p>Sources: BBC, Deutsche Welle, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
         <p>Automatically generated every Monday at 6:00 AM UTC</p>
         <p style="margin-top: 20px; opacity: 0.7; font-size: 14px;">
             Created by Eirini Ornithopoulou, for Meli, 2025
@@ -612,7 +612,7 @@ class WebpageGenerator:
     </div>
 
     <div class="footer">
-        <p>Sources: BBC, Reuters, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
+        <p>Sources: BBC, Deutsche Welle, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
         <p style="margin-top: 20px; font-size: 0.9em;">Created by Eirini Ornithopoulou, for Meli, 2025</p>
     </div>
 </body>

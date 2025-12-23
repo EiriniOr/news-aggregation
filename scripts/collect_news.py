@@ -24,11 +24,11 @@ class NewsCollector:
         # RSS feed sources - international politics
         self.feeds = {
             'bbc_world': 'https://feeds.bbci.co.uk/news/world/rss.xml',
-            'reuters': 'https://www.reuters.com/rssfeed/worldNews',
+            'dw_world': 'https://rss.dw.com/rdf/rss-en-world',
             'nyt_world': 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',
             'ft_world': 'https://www.ft.com/world?format=rss',
             'foreign_policy': 'https://foreignpolicy.com/feed/',
-            'scmp': 'https://www.scmp.com/rss/91/feed'
+            'scmp': 'https://www.scmp.com/rss/91/feed/'
         }
 
     async def collect_from_feed(self, source_name: str, feed_url: str) -> List[Dict[str, Any]]:
