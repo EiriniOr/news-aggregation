@@ -60,6 +60,16 @@ class ContentCurator:
 
 4. Select TOP 8 items per section (24 total)
 
+5. CRITICAL: Ensure source diversity. Select articles from ALL 6 sources:
+   - BBC World
+   - Reuters
+   - New York Times
+   - Financial Times
+   - Foreign Policy
+   - South China Morning Post
+
+   Aim for ~4 articles per source across all sections. Do NOT select only from 1-2 sources.
+
 Articles:
 
 {json.dumps(articles_summary, indent=2, ensure_ascii=False)}

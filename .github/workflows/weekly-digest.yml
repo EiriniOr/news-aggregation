@@ -67,7 +67,7 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{
               "from": "onboarding@resend.dev",
-              "to": ["vidar.alkelin@me.com"],
+              "to": ["renaorn@gmail.com"],
               "subject": "📰 International Politics Digest Published",
               "html": "<h2>Your weekly international politics digest is ready!</h2><p>View it here: <a href=\"https://EiriniOr.github.io/news-aggregation/\">https://EiriniOr.github.io/news-aggregation/</a></p><p>Generated: '"$(date +'%Y-%m-%d')"'</p>"
             }'
