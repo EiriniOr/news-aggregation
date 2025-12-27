@@ -1,16 +1,24 @@
-# Global News Weekly - International Politics & Swedish News Aggregator
+# International Politics Weekly Digest
 
-Automatically generates a **professional news website** with **AI-narrated audio** every week featuring the latest updates in **international politics**, **war and conflict**, **Swedish news**, and **diplomacy**.
+Automatically generates a **professional news website** with **AI-narrated audio** every week featuring the latest updates in **international politics**, **war and conflict**, and **diplomacy**.
 
 ## What It Does
 
 Every Monday at 6:00 AM UTC, this fully automated system:
 
-1. **Collects** news from major international sources (Guardian, BBC, Al Jazeera, Reuters, Svenska Dagbladet, Dagens Nyheter, Aftonbladet, The Local Sweden)
-2. **Curates** content using Claude to filter and categorize by relevance and significance
+1. **Collects** news via RSS feeds from major international sources (BBC, Deutsche Welle, New York Times, Financial Times, Foreign Policy, South China Morning Post)
+2. **Curates** content using Claude AI to filter and categorize by relevance and significance
 3. **Generates** a professional multi-column news webpage
 4. **Creates** AI-narrated audio summary with OpenAI TTS
 5. **Deploys** everything to GitHub Pages
+
+## How It Works (No Google Search)
+
+This system uses **RSS feeds**, not web scraping or Google Search:
+- RSS = structured XML feeds that news sites publish automatically
+- Free, reliable, no API keys needed for collection
+- Direct from source (BBC, NYT, etc.)
+- `feedparser` library parses the XML into Python objects
 
 ## Quick Start
 
@@ -122,19 +130,14 @@ cd /Users/rena/news-aggregation
 python3 generate_weekly_digest.py
 ```
 
-## News Sources
+## News Sources (RSS Feeds)
 
-### International Sources
-- **The Guardian** - British newspaper with global coverage
 - **BBC World** - British Broadcasting Corporation world news
-- **Al Jazeera** - Qatari international news network
-- **Reuters** - International news organization
-
-### Swedish Sources
-- **Svenska Dagbladet** - Major Swedish daily newspaper
-- **Dagens Nyheter** - Sweden's largest morning paper
-- **Aftonbladet** - Major Swedish tabloid
-- **The Local Sweden** - Sweden news in English
+- **Deutsche Welle** - German international broadcaster
+- **New York Times World** - US newspaper of record
+- **Financial Times** - Global business/politics coverage
+- **Foreign Policy** - International affairs analysis
+- **South China Morning Post** - Asian perspective
 
 ## Content Categories
 
@@ -143,9 +146,6 @@ Major diplomatic developments, elections, policy changes, government actions
 
 ### War & Conflict
 Military operations, conflicts, peace negotiations, security developments
-
-### Swedish News
-Domestic Swedish politics, economy, society, culture
 
 ### Diplomacy & Relations
 International relations, treaties, summits, bilateral agreements
@@ -157,11 +157,12 @@ International relations, treaties, summits, bilateral agreements
 ```
 ┌─────────────────┐
 │ RSS Feed Sources│
-│ • Guardian      │
-│ • BBC           │
-│ • Al Jazeera    │
-│ • Reuters       │
-│ • Swedish Media │
+│ • BBC World     │
+│ • Deutsche Welle│
+│ • NYT World     │
+│ • Financial Times│
+│ • Foreign Policy│
+│ • SCMP          │
 └────────┬────────┘
          │
          ▼
