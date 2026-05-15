@@ -48,22 +48,13 @@ jobs:
             output/audio/*.json
           retention-days: 30
 
-      - name: Deploy to GitHub Pages (preserve archives)
+      - name: Deploy to GitHub Pages
         run: |
-          # Clone existing gh-pages to get old archives
-          git clone --branch gh-pages --single-branch https://github.com/${{ github.repository }}.git gh-pages-old || mkdir gh-pages-old
-
-          # Copy old archive files to output (digest-*.html and old audio)
-          cp gh-pages-old/digest-*.html output/ 2>/dev/null || true
+          # Ensure audio dir exists for the current week's narration
           mkdir -p output/audio
-          cp gh-pages-old/audio/*.mp3 output/audio/ 2>/dev/null || true
-          cp gh-pages-old/audio/*.json output/audio/ 2>/dev/null || true
 
-          # Keep only latest 5 archives (delete oldest)
+          # Deploy fresh (no archive retention — page focuses on current week)
           cd output
-          ls -t digest-*.html 2>/dev/null | tail -n +5 | xargs rm -f 2>/dev/null || true
-
-          # Deploy
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           git init

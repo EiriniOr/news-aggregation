@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Webpage Generator - International Politics & Swedish News
-Creates a professional news website with multi-column layout
+Webpage Generator - International Politics
+Creates a futuristic 'newsroom aurora' webpage
 """
 
 import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
-import sys
+
 
 class WebpageGenerator:
     def __init__(self):
@@ -20,631 +20,722 @@ class WebpageGenerator:
     def get_latest_curated_data(self):
         """Load the most recent curated content"""
         data_files = sorted(self.data_dir.glob("curated_*.json"), reverse=True)
-
         if not data_files:
-            raise FileNotFoundError("No curated data found. Run curate_content.py first.")
-
-        with open(data_files[0], encoding='utf-8') as f:
+            raise FileNotFoundError(
+                "No curated data found. Run curate_content.py first."
+            )
+        with open(data_files[0], encoding="utf-8") as f:
             return json.load(f)
 
-    def get_recent_digests(self, limit=5):
-        """Get list of recent digest files"""
-        data_files = sorted(self.data_dir.glob("curated_*.json"), reverse=True)
-        return data_files[:limit]
-
     async def create_webpage(self, curated_data):
-        """Generate professional news webpage with multi-column layout"""
+        """Generate aurora-themed news webpage"""
         print("🎨 Creating webpage...\n")
 
-        date_str = datetime.now().strftime('%Y%m%d')
-        week_str = datetime.now().strftime('%B %d, %Y')
+        date_str = datetime.now().strftime("%Y%m%d")
+        week_str = datetime.now().strftime("%B %d, %Y")
 
-        # Get recent digests for archive
-        recent_digests = self.get_recent_digests(5)
-        archive_html = ""
-
-        for idx, digest_file in enumerate(recent_digests):
-            with open(digest_file, encoding='utf-8') as f:
-                digest_data = json.load(f)
-
-            digest_date = digest_file.stem.replace('curated_', '')
-            formatted_date = datetime.strptime(digest_date, '%Y%m%d').strftime('%B %d, %Y')
-
-            total_items = sum(len(items) for items in digest_data.get('sections', {}).values())
-
-            # Create individual archive page for older digests
-            if idx > 0:
-                archive_filename = f"digest-{digest_date}.html"
-                await self.create_archive_page(digest_data, digest_date, archive_filename)
-
-                archive_html += f"""
-                <a href="{archive_filename}" class="archive-link">
-                    <div class="archive-item">
-                        <div class="archive-date">{formatted_date}</div>
-                        <div class="archive-summary">{digest_data.get('weekly_summary', '')[:120]}...</div>
-                        <div class="archive-stats">{total_items} articles</div>
-                    </div>
-                </a>
-                """
-            else:
-                # Current week
-                archive_html += f"""
-                <div class="archive-item current-week">
-                    <div class="archive-date">{formatted_date} (Current)</div>
-                    <div class="archive-summary">{digest_data.get('weekly_summary', '')[:120]}...</div>
-                    <div class="archive-stats">{total_items} articles</div>
-                </div>
-                """
-
-        # Build sections HTML with multi-column layout
         sections_html = ""
-        sections = curated_data.get('sections', {})
+        sections = curated_data.get("sections", {})
 
-        section_icons = {
-            "International Politics": "🌍",
-            "War & Conflict": "⚔️",
-            "Diplomacy & Relations": "🤝"
-        }
-
-        section_colors = {
-            "International Politics": "#1e3a8a",
-            "War & Conflict": "#991b1b",
-            "Diplomacy & Relations": "#7c2d12"
+        section_meta = {
+            "International Politics": {
+                "icon": "🌍",
+                "color": "#fbbf24",
+                "glow": "rgba(251, 191, 36, 0.45)",
+            },
+            "War & Conflict": {
+                "icon": "⚔️",
+                "color": "#ef4444",
+                "glow": "rgba(239, 68, 68, 0.45)",
+            },
+            "Diplomacy & Relations": {
+                "icon": "🤝",
+                "color": "#14b8a6",
+                "glow": "rgba(20, 184, 166, 0.45)",
+            },
         }
 
         for section_name, items in sections.items():
             if not items:
                 continue
 
-            icon = section_icons.get(section_name, "📰")
-            color = section_colors.get(section_name, "#1e40af")
+            meta = section_meta.get(
+                section_name,
+                {"icon": "📰", "color": "#3b82f6", "glow": "rgba(59, 130, 246, 0.45)"},
+            )
+            icon = meta["icon"]
+            color = meta["color"]
+            glow = meta["glow"]
 
             items_html = ""
             for item in items:
-                title = item.get('title', '')
-                insight = item.get('insight', '')
-                source = item.get('source', 'Unknown').replace('_', ' ').title()
-                url = item.get('url', '')
-
-                url_html = f'<a href="{url}" target="_blank" class="item-link">Read article →</a>' if url else ''
+                title = item.get("title", "")
+                insight = item.get("insight", "")
+                source = item.get("source", "Unknown").replace("_", " ").title()
+                url = item.get("url", "")
+                url_html = (
+                    f'<a href="{url}" target="_blank" class="item-link">read article →</a>'
+                    if url
+                    else ""
+                )
 
                 items_html += f"""
-                <div class="content-item">
+                <article class="content-item">
                     <h3 class="item-title">{title}</h3>
                     <p class="item-insight">{insight}</p>
                     <div class="item-meta">
                         <span class="meta-source">{source}</span>
                         {url_html}
                     </div>
-                </div>
+                </article>
                 """
 
             sections_html += f"""
-            <section class="content-section" style="border-left: 4px solid {color}">
-                <h2 class="section-title">{icon} {section_name}</h2>
+            <section class="content-section" style="--accent: {color}; --accent-glow: {glow};">
+                <h2 class="section-title"><span class="section-icon">{icon}</span>{section_name}</h2>
                 <div class="section-items">
                     {items_html}
                 </div>
             </section>
             """
 
-        # Create HTML
+        weekly_summary = curated_data.get(
+            "weekly_summary", "Your weekly international news digest"
+        )
+
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global News Weekly - International Politics & Swedish News</title>
+    <title>Global News Weekly — International Politics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        * {{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {{
+            --bg-0: #060912;
+            --bg-1: #0a0e1a;
+            --bg-2: #111827;
+            --amber: #fbbf24;
+            --amber-soft: #f59e0b;
+            --crimson: #ef4444;
+            --teal: #14b8a6;
+            --blue: #3b82f6;
+            --text: #e5e7eb;
+            --text-dim: #9ca3af;
+            --text-muted: #6b7280;
         }}
 
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+
+        html {{ scroll-behavior: smooth; }}
+
         body {{
-            font-family: 'Georgia', 'Times New Roman', serif;
-            background: #f5f5f5;
-            color: #1a1a1a;
-            line-height: 1.7;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-0);
+            color: var(--text);
+            line-height: 1.65;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }}
+
+        /* Layered aurora background */
+        body::before {{
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 10% 5%, rgba(251, 191, 36, 0.12), transparent 60%),
+                radial-gradient(ellipse 60% 45% at 90% 15%, rgba(239, 68, 68, 0.10), transparent 60%),
+                radial-gradient(ellipse 80% 60% at 50% 95%, rgba(20, 184, 166, 0.12), transparent 65%),
+                radial-gradient(ellipse 50% 50% at 85% 80%, rgba(59, 130, 246, 0.08), transparent 60%),
+                linear-gradient(180deg, #060912 0%, #0a0e1a 55%, #111827 100%);
+            z-index: -3;
+            animation: auroraShift 40s ease-in-out infinite alternate;
+        }}
+
+        @keyframes auroraShift {{
+            0%   {{ filter: hue-rotate(0deg) brightness(1); }}
+            100% {{ filter: hue-rotate(-15deg) brightness(1.08); }}
+        }}
+
+        /* Animated horizontal scanlines (newsroom-monitor feel) */
+        .grid-overlay {{
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background-image:
+                linear-gradient(180deg, transparent 0%, rgba(251, 191, 36, 0.03) 50%, transparent 100%);
+            background-size: 100% 6px;
+            animation: scanMove 8s linear infinite;
+            opacity: 0.6;
+        }}
+
+        @keyframes scanMove {{
+            from {{ background-position: 0 0; }}
+            to   {{ background-position: 0 24px; }}
+        }}
+
+        /* Subtle pinpoint lights — distant city/news beacons */
+        .lights {{
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            overflow: hidden;
+        }}
+
+        .lights::before {{
+            content: '';
+            position: absolute;
+            inset: -30%;
+            background-image:
+                radial-gradient(1.5px 1.5px at 50px 80px, var(--amber), transparent),
+                radial-gradient(1px 1px at 130px 40px, var(--text), transparent),
+                radial-gradient(1.5px 1.5px at 220px 110px, var(--teal), transparent),
+                radial-gradient(1px 1px at 290px 60px, var(--text), transparent),
+                radial-gradient(2px 2px at 360px 30px, var(--crimson), transparent),
+                radial-gradient(1px 1px at 410px 130px, var(--text), transparent);
+            background-size: 500px 200px;
+            background-repeat: repeat;
+            opacity: 0.4;
+            animation: lightDrift 180s linear infinite;
+        }}
+
+        @keyframes lightDrift {{
+            from {{ transform: translate(0, 0); }}
+            to   {{ transform: translate(-500px, -200px); }}
+        }}
+
+        /* Cursor spotlight */
+        .cursor-glow {{
+            position: fixed;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.10), transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
         }}
 
         .container {{
-            max-width: 1400px;
+            max-width: 1180px;
             margin: 0 auto;
-            padding: 0;
+            padding: 22px 24px 60px;
+            position: relative;
         }}
 
-        /* Header */
+        /* Compact masthead */
         .header {{
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            padding: 60px 40px 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(20, 184, 166, 0.06));
+            border: 1px solid rgba(251, 191, 36, 0.25);
+            border-radius: 14px;
+            margin-bottom: 28px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 4px 26px rgba(251, 191, 36, 0.12);
+            position: relative;
+            overflow: hidden;
         }}
 
-        .header-content {{
-            max-width: 1200px;
-            margin: 0 auto;
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--amber), var(--crimson), transparent);
+            animation: tickerSweep 5s ease-in-out infinite;
+        }}
+
+        @keyframes tickerSweep {{
+            0%, 100% {{ left: -100%; }}
+            50%      {{ left: 100%; }}
+        }}
+
+        .brand {{ display: flex; align-items: center; gap: 14px; }}
+
+        .brand-mark {{
+            width: 42px; height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--amber), var(--crimson));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
         }}
 
         .header h1 {{
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            letter-spacing: -1px;
-        }}
-
-        .header .subtitle {{
-            font-size: 1.3rem;
-            opacity: 0.95;
-            font-weight: 300;
-            margin-bottom: 15px;
-        }}
-
-        .header .date {{
-            font-size: 1.1rem;
-            opacity: 0.85;
-            font-weight: 300;
-        }}
-
-        /* Audio Section */
-        .audio-container {{
-            background: #1e40af;
-            padding: 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
-
-        .audio-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }}
-
-        .audio-content h2 {{
-            color: white;
+            font-family: 'Playfair Display', Georgia, serif;
             font-size: 1.5rem;
-            margin-bottom: 20px;
-            font-weight: 400;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.01em;
+            line-height: 1.1;
         }}
 
-        .audio-content audio {{
-            width: 100%;
-            max-width: 700px;
-            margin: 0 auto;
+        .header .tagline {{
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 3px;
+        }}
+
+        .date-badge {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--amber);
+            padding: 6px 14px;
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            border-radius: 999px;
+            background: rgba(251, 191, 36, 0.06);
+            white-space: nowrap;
+        }}
+
+        /* Podcast hero */
+        .podcast-hero {{
+            position: relative;
+            padding: 34px 32px;
+            margin-bottom: 32px;
+            border-radius: 22px;
+            background:
+                radial-gradient(ellipse at top left, rgba(251, 191, 36, 0.20), transparent 60%),
+                radial-gradient(ellipse at bottom right, rgba(239, 68, 68, 0.18), transparent 60%),
+                rgba(10, 14, 26, 0.65);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 8px 36px rgba(251, 191, 36, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }}
+
+        .podcast-hero::before {{
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 22px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--amber), var(--crimson), var(--teal));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            opacity: 0.45;
+            pointer-events: none;
+            animation: borderPulse 6s ease-in-out infinite;
+        }}
+
+        @keyframes borderPulse {{
+            0%, 100% {{ opacity: 0.35; }}
+            50%      {{ opacity: 0.7; }}
+        }}
+
+        .podcast-label {{
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--crimson);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }}
+
+        .live-dot {{
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--crimson);
+            box-shadow: 0 0 12px var(--crimson);
+            animation: pulse 1.8s ease-in-out infinite;
+        }}
+
+        @keyframes pulse {{
+            0%, 100% {{ opacity: 1; transform: scale(1); }}
+            50%      {{ opacity: 0.45; transform: scale(0.85); }}
+        }}
+
+        .podcast-title {{
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.1rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, var(--amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }}
+
+        .podcast-sub {{
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            font-size: 1rem;
+            max-width: 740px;
+        }}
+
+        .audio-shell {{
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 14px 20px;
+            background: rgba(6, 9, 18, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }}
+
+        .visualizer {{
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 32px;
+            flex-shrink: 0;
+        }}
+
+        .visualizer span {{
             display: block;
+            width: 3px;
+            background: linear-gradient(180deg, var(--amber), var(--crimson));
+            border-radius: 2px;
+            animation: bars 1.1s ease-in-out infinite;
         }}
 
-        .audio-content p {{
-            color: rgba(255,255,255,0.8);
-            margin-top: 15px;
-            font-size: 0.95rem;
+        .visualizer span:nth-child(1) {{ height: 45%; animation-delay: 0.0s; }}
+        .visualizer span:nth-child(2) {{ height: 85%; animation-delay: 0.12s; }}
+        .visualizer span:nth-child(3) {{ height: 30%; animation-delay: 0.24s; }}
+        .visualizer span:nth-child(4) {{ height: 95%; animation-delay: 0.36s; }}
+        .visualizer span:nth-child(5) {{ height: 55%; animation-delay: 0.48s; }}
+
+        @keyframes bars {{
+            0%, 100% {{ transform: scaleY(0.4); }}
+            50%      {{ transform: scaleY(1); }}
         }}
 
-        /* Main Content */
-        .main-content {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        audio {{
+            flex: 1;
+            min-width: 0;
+            height: 40px;
         }}
+
+        audio::-webkit-media-controls-panel {{ background: transparent; }}
 
         /* Summary */
         .summary {{
-            background: white;
-            border-left: 5px solid #1e40af;
-            padding: 35px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 22px 26px;
+            border-radius: 14px;
+            margin-bottom: 30px;
+            background: rgba(10, 14, 26, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-left: 3px solid var(--blue);
+            backdrop-filter: blur(10px);
         }}
 
         .summary h2 {{
-            color: #1e40af;
-            margin-bottom: 18px;
-            font-size: 1.8rem;
-            font-weight: 600;
+            font-size: 0.76rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--blue);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }}
 
         .summary p {{
-            font-size: 1.15rem;
-            line-height: 1.8;
-            color: #374151;
+            font-size: 1.04rem;
+            color: var(--text);
+            line-height: 1.7;
         }}
 
-        /* Content Sections */
+        /* Content sections */
         .content-section {{
-            background: white;
-            padding: 35px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 26px 28px;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            background: rgba(10, 14, 26, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 22px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.4s, box-shadow 0.4s;
+        }}
+
+        .content-section:hover {{
+            border-color: var(--accent);
+            box-shadow: 0 8px 38px var(--accent-glow);
         }}
 
         .section-title {{
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #1a1a1a;
-            font-weight: 600;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 22px;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }}
+
+        .section-icon {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px; height: 36px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--accent);
+            font-size: 1.1rem;
+            box-shadow: 0 0 14px var(--accent-glow);
         }}
 
         .section-items {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
         }}
 
         .content-item {{
-            background: #fafafa;
-            padding: 25px;
-            border: 1px solid #e5e7eb;
-            transition: all 0.3s ease;
+            position: relative;
+            padding: 20px 22px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 11px;
+            transition: transform 0.3s ease, background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }}
+
+        .content-item::before {{
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }}
 
         .content-item:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background: white;
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--accent);
+            box-shadow: 0 8px 26px var(--accent-glow);
         }}
 
+        .content-item:hover::before {{ opacity: 1; }}
+
         .item-title {{
-            color: #1a1a1a;
-            margin-bottom: 12px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            line-height: 1.4;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            line-height: 1.35;
         }}
 
         .item-insight {{
-            color: #4b5563;
-            margin-bottom: 18px;
-            font-size: 1rem;
+            color: var(--text-dim);
+            font-size: 0.96rem;
+            margin-bottom: 14px;
             line-height: 1.6;
+            flex: 1;
         }}
 
         .item-meta {{
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
             flex-wrap: wrap;
-            gap: 10px;
-            padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 0.9rem;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
         }}
 
-        .meta-source {{
-            color: #6b7280;
-            font-weight: 500;
-        }}
+        .meta-source {{ color: var(--text-muted); }}
 
         .item-link {{
-            color: #1e40af;
+            color: var(--accent);
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
+            transition: filter 0.2s, transform 0.2s;
         }}
 
         .item-link:hover {{
-            color: #3b82f6;
-            text-decoration: underline;
-        }}
-
-        /* Archive Section */
-        .archive {{
-            background: white;
-            padding: 35px;
-            margin-top: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }}
-
-        .archive h2 {{
-            color: #1e40af;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }}
-
-        .archive-link {{
-            text-decoration: none;
-            display: block;
-            transition: transform 0.2s;
-        }}
-
-        .archive-link:hover {{
-            transform: translateX(5px);
-        }}
-
-        .archive-item {{
-            background: #fafafa;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid #1e40af;
-            transition: all 0.2s;
-        }}
-
-        .archive-link .archive-item:hover {{
-            background: #f3f4f6;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }}
-
-        .archive-item.current-week {{
-            border-left: 4px solid #3b82f6;
-        }}
-
-        .archive-date {{
-            color: #1e40af;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 1.05rem;
-        }}
-
-        .archive-summary {{
-            color: #4b5563;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }}
-
-        .archive-stats {{
-            color: #6b7280;
-            font-size: 0.85rem;
+            filter: brightness(1.3);
+            transform: translateX(3px);
         }}
 
         /* Footer */
         .footer {{
-            background: #1f2937;
-            color: #d1d5db;
             text-align: center;
-            padding: 40px 20px;
-            margin-top: 60px;
-        }}
-
-        .footer p {{
-            margin-bottom: 10px;
+            padding: 40px 20px 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
         }}
 
         .footer a {{
-            color: #93c5fd;
+            color: var(--amber);
             text-decoration: none;
+            transition: color 0.2s;
         }}
 
-        .footer a:hover {{
-            color: #bfdbfe;
-            text-decoration: underline;
+        .footer a:hover {{ color: var(--crimson); }}
+
+        .footer p {{ margin-bottom: 6px; }}
+
+        .footer .signature {{ margin-top: 22px; opacity: 0.6; font-size: 0.78rem; }}
+
+        /* Reveal on scroll */
+        .reveal {{
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
         }}
 
-        /* Responsive */
-        @media (max-width: 768px) {{
-            .header h1 {{
-                font-size: 2.5rem;
-            }}
+        .reveal.visible {{
+            opacity: 1;
+            transform: translateY(0);
+        }}
 
-            .section-items {{
-                grid-template-columns: 1fr;
-            }}
-
-            .content-item {{
-                padding: 20px;
-            }}
-
-            .item-meta {{
-                flex-direction: column;
-                align-items: flex-start;
-            }}
+        @media (max-width: 700px) {{
+            .container {{ padding: 16px; }}
+            .header {{ padding: 14px 16px; flex-wrap: wrap; }}
+            .header h1 {{ font-size: 1.2rem; }}
+            .podcast-hero {{ padding: 26px 22px; }}
+            .podcast-title {{ font-size: 1.6rem; }}
+            .audio-shell {{ flex-wrap: wrap; }}
+            .cursor-glow {{ display: none; }}
         }}
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <h1>Global News Weekly</h1>
-            <p class="subtitle">International Politics, Conflict Analysis & Diplomatic Relations</p>
-            <p class="date">Week of {week_str}</p>
-        </div>
-    </div>
+    <div class="grid-overlay"></div>
+    <div class="lights"></div>
+    <div class="cursor-glow"></div>
 
-    <!-- Audio Narration -->
-    <div class="audio-container">
-        <div class="audio-content">
-            <h2>Listen to This Week's Digest</h2>
-            <audio controls>
-                <source src="audio/narration_{date_str}.mp3" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-            <p>AI-narrated summary of this week's most important global news</p>
-        </div>
-    </div>
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-mark">🌐</div>
+                <div>
+                    <h1>Global News Weekly</h1>
+                    <div class="tagline">// international politics · every monday 06:00 UTC</div>
+                </div>
+            </div>
+            <div class="date-badge">{week_str}</div>
+        </header>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Summary -->
-        <div class="summary">
-            <h2>This Week's Overview</h2>
-            <p>{curated_data.get('weekly_summary', 'Your weekly international news digest')}</p>
-        </div>
+        <section class="podcast-hero reveal">
+            <div class="podcast-label"><span class="live-dot"></span>this week's briefing</div>
+            <h2 class="podcast-title">🎙️ Listen to the Briefing</h2>
+            <p class="podcast-sub">AI-narrated summary of the week's most consequential international politics, conflict updates, and diplomatic developments — curated from BBC, Deutsche Welle, NYT, FT, Foreign Policy, and South China Morning Post.</p>
+            <div class="audio-shell">
+                <div class="visualizer" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <audio controls preload="metadata">
+                    <source src="audio/narration_{date_str}.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </section>
 
-        <!-- Content Sections -->
+        <section class="summary reveal">
+            <h2>// this week's overview</h2>
+            <p>{weekly_summary}</p>
+        </section>
+
         {sections_html}
 
-        <!-- Archive -->
-        <div class="archive">
-            <h2>Recent Editions</h2>
-            {archive_html}
-        </div>
+        <footer class="footer">
+            <p>// curated from BBC · Deutsche Welle · NYT · FT · Foreign Policy · SCMP</p>
+            <p>auto-generated every monday at 06:00 UTC</p>
+            <p style="margin-top: 16px;"><a href="https://github.com/EiriniOr/news-aggregation" target="_blank">view on github</a></p>
+            <p class="signature">crafted by Eirini Ornithopoulou · for Meli, 2025</p>
+        </footer>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        <p>Sources: BBC, Deutsche Welle, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
-        <p>Automatically generated every Monday at 6:00 AM UTC</p>
-        <p style="margin-top: 20px; opacity: 0.7; font-size: 14px;">
-            Created by Eirini Ornithopoulou, for Meli, 2025
-        </p>
-    </div>
+    <script>
+        // Cursor-following glow
+        const glow = document.querySelector('.cursor-glow');
+        let glowX = window.innerWidth / 2, glowY = window.innerHeight / 2;
+        let targetX = glowX, targetY = glowY;
+
+        document.addEventListener('mousemove', (e) => {{
+            targetX = e.clientX;
+            targetY = e.clientY;
+        }});
+
+        function animateGlow() {{
+            glowX += (targetX - glowX) * 0.1;
+            glowY += (targetY - glowY) * 0.1;
+            glow.style.left = glowX + 'px';
+            glow.style.top  = glowY + 'px';
+            requestAnimationFrame(animateGlow);
+        }}
+        animateGlow();
+
+        // Reveal on scroll
+        const observer = new IntersectionObserver((entries) => {{
+            entries.forEach((entry) => {{
+                if (entry.isIntersecting) {{
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }}
+            }});
+        }}, {{ threshold: 0.1 }});
+
+        document.querySelectorAll('.content-section, .summary, .podcast-hero').forEach((el) => {{
+            el.classList.add('reveal');
+            observer.observe(el);
+        }});
+
+        setTimeout(() => {{
+            document.querySelectorAll('.podcast-hero, .summary').forEach((el) => el.classList.add('visible'));
+        }}, 100);
+    </script>
 </body>
 </html>
 """
 
-        # Write HTML file
         output_path = self.output_dir / "index.html"
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(html_content)
 
-        print(f"✅ Webpage created successfully!")
+        print("✅ Webpage created successfully!")
         print(f"📁 Location: {output_path}")
-
         return output_path
-
-    async def create_archive_page(self, curated_data, date_str, filename):
-        """Create an individual archive page for a past digest"""
-        formatted_date = datetime.strptime(date_str, '%Y%m%d').strftime('%B %d, %Y')
-
-        # Build sections HTML
-        sections_html = ""
-        sections = curated_data.get('sections', {})
-
-        section_icons = {
-            "International Politics": "🌍",
-            "War & Conflict": "⚔️",
-            "Diplomacy & Relations": "🤝"
-        }
-
-        section_colors = {
-            "International Politics": "#1e3a8a",
-            "War & Conflict": "#991b1b",
-            "Diplomacy & Relations": "#7c2d12"
-        }
-
-        for section_name, items in sections.items():
-            if not items:
-                continue
-
-            icon = section_icons.get(section_name, "📰")
-            color = section_colors.get(section_name, "#1e40af")
-
-            items_html = ""
-            for item in items:
-                title = item.get('title', '')
-                insight = item.get('insight', '')
-                source = item.get('source', 'Unknown').replace('_', ' ').title()
-                url = item.get('url', '')
-
-                url_html = f'<a href="{url}" target="_blank" class="item-link">Read article →</a>' if url else ''
-
-                items_html += f"""
-                <div class="content-item">
-                    <h3 class="item-title">{title}</h3>
-                    <p class="item-insight">{insight}</p>
-                    <div class="item-meta">
-                        <span class="meta-source">{source}</span>
-                        {url_html}
-                    </div>
-                </div>
-                """
-
-            sections_html += f"""
-            <section class="content-section" style="border-left: 4px solid {color}">
-                <h2 class="section-title">{icon} {section_name}</h2>
-                <div class="section-items">
-                    {items_html}
-                </div>
-            </section>
-            """
-
-        # Use same CSS as main page (abbreviated for brevity)
-        html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global News Weekly - {formatted_date}</title>
-    <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{ font-family: 'Georgia', 'Times New Roman', serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.7; }}
-        .container {{ max-width: 1400px; margin: 0 auto; padding: 0; }}
-        .header {{ background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 60px 40px 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }}
-        .header-content {{ max-width: 1200px; margin: 0 auto; }}
-        .header h1 {{ font-size: 3.5rem; font-weight: 700; margin-bottom: 15px; letter-spacing: -1px; }}
-        .header .subtitle {{ font-size: 1.3rem; opacity: 0.95; font-weight: 300; margin-bottom: 15px; }}
-        .header .date {{ font-size: 1.1rem; opacity: 0.85; font-weight: 300; }}
-        .back-link {{ display: inline-block; margin: 20px 40px; color: #1e40af; text-decoration: none; font-size: 1.1rem; font-weight: 500; }}
-        .back-link:hover {{ color: #3b82f6; text-decoration: underline; }}
-        .main-content {{ max-width: 1200px; margin: 0 auto; padding: 40px 20px; }}
-        .summary {{ background: white; border-left: 5px solid #1e40af; padding: 35px; margin-bottom: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }}
-        .summary h2 {{ color: #1e40af; margin-bottom: 18px; font-size: 1.8rem; font-weight: 600; }}
-        .summary p {{ font-size: 1.15rem; line-height: 1.8; color: #374151; }}
-        .content-section {{ background: white; padding: 35px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }}
-        .section-title {{ font-size: 2rem; margin-bottom: 30px; color: #1a1a1a; font-weight: 600; padding-bottom: 15px; border-bottom: 2px solid #e5e7eb; }}
-        .section-items {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }}
-        .content-item {{ background: #fafafa; padding: 25px; border: 1px solid #e5e7eb; transition: all 0.3s ease; }}
-        .content-item:hover {{ transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white; }}
-        .item-title {{ color: #1a1a1a; margin-bottom: 12px; font-size: 1.25rem; font-weight: 600; line-height: 1.4; }}
-        .item-insight {{ color: #4b5563; margin-bottom: 18px; font-size: 1rem; line-height: 1.6; }}
-        .item-meta {{ display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-size: 0.9rem; }}
-        .meta-source {{ color: #6b7280; font-weight: 500; }}
-        .item-link {{ color: #1e40af; text-decoration: none; font-weight: 500; transition: color 0.2s; }}
-        .item-link:hover {{ color: #3b82f6; text-decoration: underline; }}
-        .footer {{ background: #1f2937; color: #d1d5db; text-align: center; padding: 40px 20px; margin-top: 60px; }}
-        .footer a {{ color: #93c5fd; text-decoration: none; }}
-        .footer a:hover {{ color: #bfdbfe; text-decoration: underline; }}
-        @media (max-width: 768px) {{ .header h1 {{ font-size: 2.5rem; }} .section-items {{ grid-template-columns: 1fr; }} }}
-    </style>
-</head>
-<body>
-    <a href="index.html" class="back-link">← Back to Latest Digest</a>
-
-    <div class="header">
-        <div class="header-content">
-            <h1>Global News Weekly</h1>
-            <p class="subtitle">Archived Edition</p>
-            <p class="date">{formatted_date}</p>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="summary">
-            <h2>This Week's Overview</h2>
-            <p>{curated_data.get('weekly_summary', 'Your weekly international news digest')}</p>
-        </div>
-
-        {sections_html}
-    </div>
-
-    <div class="footer">
-        <p>Sources: BBC, Deutsche Welle, New York Times, Financial Times, Foreign Policy, South China Morning Post</p>
-        <p style="margin-top: 20px; font-size: 0.9em;">Created by Eirini Ornithopoulou, for Meli, 2025</p>
-    </div>
-</body>
-</html>
-"""
-
-        # Write archive HTML file
-        archive_path = self.output_dir / filename
-        with open(archive_path, 'w', encoding='utf-8') as f:
-            f.write(html_content)
-
-        print(f"  ✓ Created archive page: {filename}")
 
     async def generate(self):
         """Main generation workflow"""
         print("🎯 Starting webpage generation...\n")
-
-        # Load curated data
         curated_data = self.get_latest_curated_data()
-
-        total_items = sum(len(items) for items in curated_data.get('sections', {}).values())
+        total_items = sum(
+            len(items) for items in curated_data.get("sections", {}).values()
+        )
         print(f"📊 Loaded curated content with {total_items} items\n")
-
-        # Create webpage
         filepath = await self.create_webpage(curated_data)
-
         return filepath
+
 
 async def main():
     generator = WebpageGenerator()
     filepath = await generator.generate()
     print(f"\n🎉 Done! Open your webpage:\n   {filepath}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())
